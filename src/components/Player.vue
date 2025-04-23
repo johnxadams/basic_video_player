@@ -1,7 +1,7 @@
 <template>
   <div class="player">
     <!-- <div class="player__sizer">
-      <video controls>
+      <video>
         <source type="video/webm" :src="videoUrl" />
         Your browser does not support the video tag.
       </video>

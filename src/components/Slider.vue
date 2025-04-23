@@ -32,14 +32,8 @@ const bar = ref(null)
 const handle = ref(null)
 
 onMounted(() => {
-  console.log('handle width:', handle)
-
-  const barWidth = bar.value.offsetWidth
-  console.log('Bar width:', barWidth)
-
   getDimensions()
   window.addEventListener('resize', throttledWindowResize)
-  //   window.addEventListener('resize', onWindowResize)
 })
 
 onBeforeUnmount(() => {
@@ -53,7 +47,7 @@ const onWindowResize = () => {
 const throttledWindowResize = throttle(onWindowResize, 200)
 
 const getDimensions = () => {
-  // Zugriff auf die DOM-Elemente über die Refs
+  // target DOM Element thru ref="bar/handle"
   handleWidth.value = handle.value.offsetWidth
   barWidth.value = bar.value.offsetWidth
 }
