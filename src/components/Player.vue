@@ -1,16 +1,21 @@
 <template>
   <div class="player">
-    <div class="player__sizer">
+    <!-- <div class="player__sizer">
       <video controls>
         <source type="video/webm" :src="videoUrl" />
         Your browser does not support the video tag.
       </video>
+    </div> -->
+
+    <div class="player__control">
+      <Slider />
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import Slider from './Slider.vue'
 
 const videoUrl = ref(
   'https://meetyoo-code-challenge.s3.eu-central-1.amazonaws.com/live/S14JJ9Z6PKoO/bf1d4883-5305-4d65-a299-cbb654ef1ed9/video.webm',
