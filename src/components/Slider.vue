@@ -1,5 +1,5 @@
 <template>
-  <div class="slider" @mousedown="onSliderMouseDown">
+  <div class="slider" @mousedown="onSliderMouseDown" @click="onSliderClick">
     <div class="slider__bar" ref="bar">
       <div class="slider__handler" ref="handler" :style="handlerStyle"></div>
       <div class="slider__fill" :style="fillStyle"></div>
@@ -9,9 +9,10 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { getRelativeXPosition } from '@/utils/helpers'
 import { throttle } from 'lodash'
 
-const emit = defineEmits(['dragstart', 'dragend', 'click'])
+const emit = defineEmits(['dragstart', 'dragend', 'click', 'input'])
 const props = defineProps({
   min: {
     type: Number,
@@ -39,12 +40,14 @@ onMounted(() => {
   window.addEventListener('resize', throttledWindowResize)
 
   document.addEventListener('mouseup', onDocumentMouseUp)
+  document.addEventListener('mousemove', onDocumentMouseMove)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', onWindowResize)
 
   document.removeEventListener('mouseup', onDocumentMouseUp)
+  document.removeEventListener('mousemove', onDocumentMouseMove)
 })
 
 /** Computed Start */
@@ -61,10 +64,11 @@ const fillStyle = computed(() => {
 })
 
 const handlerStyle = computed(() => {
-  const offset = barWidth.value * fillRatio.value - handlerWidth.value * 0.5
+  // const offset = barWidth.value * fillRatio.value - handlerWidth.value * 0.5
 
   return {
-    transform: `translateX(${offset}px)`,
+    // transform: `translateX(${offset}px)`,
+    transform: `translateX(${barWidth.value * fillRatio.value - handlerWidth.value * 0.5}px)`,
   }
 })
 
@@ -94,7 +98,18 @@ const onSliderMouseDown = () => {
   }, dragDelay.value)
 }
 
+const onSliderClick = (e) => {
+  if (props.disabled) return
+  calculate(e)
+}
+
 /** Method eventListener */
+function onDocumentMouseMove(e) {
+  if (props.disabled || !isDragging.value) return
+
+  calculate(e)
+}
+
 const onDocumentMouseUp = () => {
   if (props.disabled) return
 
@@ -109,6 +124,31 @@ const onDocumentMouseUp = () => {
     emit('dragend')
     console.log('Ended dragging')
   }
+}
+
+const lerp = (min, max, t) => {
+  return min + (max - min) * t
+}
+
+const calculate = (e) => {
+  /**
+   * Holt die X-Position der Maus relativ zur bar
+   * Berechnet den Delta-Wert (0–1) und emittiert den neuen Wert über input
+   */
+
+  if (!bar.value || barWidth.value === 0) return
+
+  const barLevelX = getRelativeXPosition(e, bar.value)
+
+  // volumeLevel -> ergebnis vom relativeX / barWidth is eine Zahl zwischen 0 & 1
+  const volumeLevel = barLevelX / barWidth.value
+
+  console.log('barLevelX, barWidth:', barLevelX, barWidth.value)
+  console.log('props.min, props.max, volumeLevel:', props.min, props.max, volumeLevel)
+
+  const interpolated = lerp(props.min, props.max, volumeLevel)
+
+  emit('input', interpolated)
 }
 </script>
 
