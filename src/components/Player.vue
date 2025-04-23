@@ -8,7 +8,7 @@
     </div> -->
 
     <div class="player__control">
-      <Slider />
+      <Slider :value="0.8" />
     </div>
   </div>
 </template>

@@ -1,14 +1,14 @@
 <template>
   <div class="slider">
     <div class="slider__bar" ref="bar">
-      <div class="slider__handler" ref="handle"></div>
-      <div class="slider__fill"></div>
+      <div class="slider__handler" ref="handler" :style="handlerStyle"></div>
+      <div class="slider__fill" :style="fillStyle"></div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { throttle } from 'lodash'
 
 const props = defineProps({
@@ -25,11 +25,11 @@ const props = defineProps({
 })
 
 const isDragging = ref(false) // check if element is being dragged or not
-const handleWidth = ref(0) // track the handle element and update when window resizes
+const handlerWidth = ref(0) // track the handler element and update when window resizes
 const barWidth = ref(0) // track the value of the width of the bar
 
 const bar = ref(null)
-const handle = ref(null)
+const handler = ref(null)
 
 onMounted(() => {
   getDimensions()
@@ -40,6 +40,25 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', onWindowResize)
 })
 
+const fillRatio = computed(() => {
+  return props.value / props.max
+})
+
+const fillStyle = computed(() => {
+  return {
+    transformOrigin: 'left center',
+    transform: `scaleX(${fillRatio.value})`,
+  }
+})
+
+const handlerStyle = computed(() => {
+  const offset = barWidth.value * fillRatio.value - handlerWidth.value * 0.5
+
+  return {
+    transform: `translateX(${offset}px)`,
+  }
+})
+
 const onWindowResize = () => {
   getDimensions()
 }
@@ -47,8 +66,8 @@ const onWindowResize = () => {
 const throttledWindowResize = throttle(onWindowResize, 200)
 
 const getDimensions = () => {
-  // target DOM Element thru ref="bar/handle"
-  handleWidth.value = handle.value.offsetWidth
+  // target DOM Element thru ref="bar/handler"
+  handlerWidth.value = handler.value.offsetWidth
   barWidth.value = bar.value.offsetWidth
 }
 </script>
@@ -62,7 +81,7 @@ const getDimensions = () => {
   cursor: pointer;
 
   &__fill,
-  &__handle {
+  &__handler {
     transition: transform 0.3s ease-in-out;
   }
 
@@ -82,6 +101,14 @@ const getDimensions = () => {
     left: 0;
     top: calc(50% - 7px); // align element in the middle  -> 7px is 50% of 14px height&width
     z-index: 2; // set handle above fill_Element
+  }
+
+  &__fill {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    background-color: rgb(14, 126, 178);
+    z-index: 1;
   }
 }
 </style>
