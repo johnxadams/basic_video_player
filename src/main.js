@@ -1,6 +1,11 @@
-import './assets/main.css'
-
 import { createApp } from 'vue'
 import App from './App.vue'
 
-createApp(App).mount('#app')
+import { Quasar } from 'quasar'
+import 'quasar/dist/quasar.css' // Import Quasar's core CSS
+
+const app = createApp(App)
+
+app.use(Quasar)
+
+app.mount('#app')
