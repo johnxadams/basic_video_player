@@ -1,11 +1,7 @@
 <template>
-  <v-app>
-    <v-main>
-      <div class="test">
-        <Player />
-      </div>
-    </v-main>
-  </v-app>
+  <div class="flex items-center justify-center q-mx-auto full-height" :style="{ width: '60%' }">
+    <Player />
+  </div>
 </template>
 <script setup>
 import Player from './components/Player.vue'

@@ -1,12 +1,10 @@
 <template>
   <div class="player">
-    Player
     <div class="player__sizer">
-      <video>
+      <video controls>
         <source type="video/webm" :src="videoUrl" />
         Your browser does not support the video tag.
       </video>
-      Player Sizer
     </div>
   </div>
 </template>
@@ -23,13 +21,20 @@ const videoUrl = ref(
 .player {
   position: relative;
   width: 100%;
-  outline: 2px green dotted;
+
+  video {
+    position: absolute;
+
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+  }
 
   &__sizer {
     position: relative;
     width: 100%;
-    padding-top: 56.25%; // 16 by 9 ratio value. the height of the element would be always 56.25 of of 100%
-    border: 1px blue solid;
+    padding-top: 56.25%; // 16 by 9 ratio value. the height of the element will be always 56.25 of of 100%
   }
 }
 </style>
