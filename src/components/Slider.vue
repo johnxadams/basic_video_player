@@ -1,5 +1,5 @@
 <template>
-  <div class="slider">
+  <div class="slider" @mousedown="onSliderMouseDown">
     <div class="slider__bar" ref="bar">
       <div class="slider__handler" ref="handler" :style="handlerStyle"></div>
       <div class="slider__fill" :style="fillStyle"></div>
@@ -11,6 +11,7 @@
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { throttle } from 'lodash'
 
+const emit = defineEmits(['dragstart', 'dragend', 'click'])
 const props = defineProps({
   min: {
     type: Number,
@@ -24,7 +25,9 @@ const props = defineProps({
   disabled: Boolean,
 })
 
+const dragTimeout = ref(null) // value of setTimeout fn
 const isDragging = ref(false) // check if element is being dragged or not
+const dragDelay = ref(100) // setTimerout duration
 const handlerWidth = ref(0) // track the handler element and update when window resizes
 const barWidth = ref(0) // track the value of the width of the bar
 
@@ -34,11 +37,17 @@ const handler = ref(null)
 onMounted(() => {
   getDimensions()
   window.addEventListener('resize', throttledWindowResize)
+
+  document.addEventListener('mouseup', onDocumentMouseUp)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', onWindowResize)
+
+  document.removeEventListener('mouseup', onDocumentMouseUp)
 })
+
+/** Computed Start */
 
 const fillRatio = computed(() => {
   return props.value / props.max
@@ -59,6 +68,8 @@ const handlerStyle = computed(() => {
   }
 })
 
+/** Methods Start */
+
 const onWindowResize = () => {
   getDimensions()
 }
@@ -69,6 +80,35 @@ const getDimensions = () => {
   // target DOM Element thru ref="bar/handler"
   handlerWidth.value = handler.value.offsetWidth
   barWidth.value = bar.value.offsetWidth
+}
+
+const onSliderMouseDown = () => {
+  if (props.disabled) return
+
+  dragTimeout.value = setTimeout(() => {
+    isDragging.value = true
+    dragTimeout.value = null
+
+    emit('dragstart')
+    console.log('Started dragging')
+  }, dragDelay.value)
+}
+
+/** Method eventListener */
+const onDocumentMouseUp = () => {
+  if (props.disabled) return
+
+  if (dragTimeout.value) {
+    clearTimeout(dragTimeout.value)
+    dragTimeout.value = null
+
+    emit('click')
+    console.log('Clicked')
+  } else {
+    isDragging.value = false
+    emit('dragend')
+    console.log('Ended dragging')
+  }
 }
 </script>
 
