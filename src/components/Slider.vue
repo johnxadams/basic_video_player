@@ -1,5 +1,5 @@
 <template>
-  <div class="slider" @mousedown="onSliderMouseDown" @click="onSliderClick">
+  <div :class="classes" @mousedown="onSliderMouseDown" @click="onSliderClick">
     <div class="slider__bar" ref="bar">
       <div class="slider__handler" ref="handler" :style="handlerStyle"></div>
       <div class="slider__fill" :style="fillStyle"></div>
@@ -69,6 +69,13 @@ const handlerStyle = computed(() => {
   return {
     // transform: `translateX(${offset}px)`,
     transform: `translateX(${barWidth.value * fillRatio.value - handlerWidth.value * 0.5}px)`,
+  }
+})
+
+const classes = computed(() => {
+  return {
+    slider: true,
+    'slider--dragging': isDragging.value,
   }
 })
 
@@ -162,7 +169,12 @@ const calculate = (e) => {
 
   &__fill,
   &__handler {
-    transition: transform 0.3s ease-in-out;
+    transition: transform 0.2s ease-in-out;
+  }
+
+  .slider--dragging .slider__fill,
+  .slider--dragging .slider__handle {
+    transition: none;
   }
 
   &__bar {
