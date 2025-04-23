@@ -169,7 +169,7 @@ const calculate = (e) => {
 
   &__fill,
   &__handler {
-    transition: transform 0.2s ease-in-out;
+    transition: transform 0.025s ease-in-out;
   }
 
   .slider--dragging .slider__fill,
