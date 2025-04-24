@@ -11,13 +11,16 @@
 
     <div class="player__controls">
       <q-toolbar class="bg-transparent player__toolbar" dense flat>
-        <q-btn color="white" round flat>
-          <q-icon name="mdi-play" />
-        </q-btn>
-        <q-btn color="white" round flat>
-          <q-icon name="mdi-volume-high" />
-        </q-btn>
-        <Slider class="player__sound-slider" :value="1" />
+        <q-btn color="white" flat round icon="mdi-play" />
+        <q-btn color="white" flat round icon="mdi-volume-high" />
+
+        <Slider class="player__sound-slider q-mr-md" :value="1" />
+
+        <div class="player__time">00:000 / 00/00</div>
+
+        <q-space />
+
+        <q-btn color="white" flat round icon="mdi-fullscreen" />
       </q-toolbar>
     </div>
 
@@ -67,6 +70,22 @@ const videoUrl = ref(
 
   &__sound-slider {
     width: 96px;
+  }
+
+  &__time {
+    color: #fff;
+  }
+
+  &__gradient {
+    background: #000000;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 100%);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 0;
+    height: 25%; //  responsiveness
+    opacity: 0.7;
   }
 }
 </style>
