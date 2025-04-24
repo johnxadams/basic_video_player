@@ -1,7 +1,7 @@
 <template>
   <div class="player">
     <div class="player__sizer">
-      <video>
+      <video ref="videoRef" @play="onVideoPlay" @pause="onVideoPause" @click="togglePlay">
         <source type="video/webm" :src="videoUrl" />
         Your browser does not support the video tag.
       </video>
@@ -11,8 +11,14 @@
 
     <div class="player__controls">
       <q-toolbar class="bg-transparent player__toolbar" dense flat>
-        <q-btn color="white" flat round icon="mdi-play" />
-        <q-btn color="white" flat round icon="mdi-volume-high" />
+        <q-btn
+          color="white"
+          flat
+          round
+          :icon="isPlaying ? 'mdi-pause' : 'mdi-play'"
+          @click="togglePlay"
+        />
+        <q-btn color="white" flat round icon="mdi-volume-high" @click="toggleSound" />
 
         <Slider class="player__sound-slider q-mr-md" :value="1" />
 
@@ -31,13 +37,53 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import Slider from './Slider.vue'
 
 // const value = ref(0.3)
 const videoUrl = ref(
   'https://meetyoo-code-challenge.s3.eu-central-1.amazonaws.com/live/S14JJ9Z6PKoO/bf1d4883-5305-4d65-a299-cbb654ef1ed9/video.webm',
 )
+
+const isPlaying = ref(false)
+const isMuted = ref(false)
+const isFullscreen = ref(false)
+const duration = ref(0)
+const currentTime = ref(0)
+const videoRef = ref(null)
+
+onMounted(() => {
+  document.addEventListener('keyup', onDocumentKeyUp)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('keyup', onDocumentKeyUp)
+})
+
+const togglePlay = () => {
+  const video = videoRef.value
+  if (!video) return
+
+  if (video.paused) {
+    video.play()
+  } else {
+    video.pause()
+  }
+}
+
+const onVideoPlay = () => {
+  isPlaying.value = true
+}
+
+const onVideoPause = () => {
+  isPlaying.value = false
+}
+
+const onDocumentKeyUp = (e) => {
+  if (e.keyCode === 32) {
+    togglePlay()
+  }
+}
 </script>
 
 <style lang="scss" scoped>
