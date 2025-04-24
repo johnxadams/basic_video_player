@@ -34,7 +34,7 @@
 
         <Slider
           class="player__sound-slider q-mr-md"
-          :value="volume"
+          :value="isMuted ? 0 : volume"
           @input="handleVolumeSliderChange"
         />
 
