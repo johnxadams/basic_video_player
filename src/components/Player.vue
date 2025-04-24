@@ -8,7 +8,7 @@
     </div> -->
 
     <div class="player__control">
-      <Slider :value="0.8" />
+      <Slider :value="value" @input="(val) => (value = val)" />
     </div>
   </div>
 </template>
@@ -17,6 +17,7 @@
 import { ref } from 'vue'
 import Slider from './Slider.vue'
 
+const value = ref(0.3)
 const videoUrl = ref(
   'https://meetyoo-code-challenge.s3.eu-central-1.amazonaws.com/live/S14JJ9Z6PKoO/bf1d4883-5305-4d65-a299-cbb654ef1ed9/video.webm',
 )

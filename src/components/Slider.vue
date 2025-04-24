@@ -1,5 +1,5 @@
 <template>
-  <div class="slider">
+  <div :class="classes" @mousedown="onSliderMouseDown" @click="onSliderClick">
     <div class="slider__bar" ref="bar">
       <div class="slider__handler" ref="handler" :style="handlerStyle"></div>
       <div class="slider__fill" :style="fillStyle"></div>
@@ -9,8 +9,10 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { getRelativeXPosition } from '@/utils/helpers'
 import { throttle } from 'lodash'
 
+const emit = defineEmits(['dragstart', 'dragend', 'click', 'input'])
 const props = defineProps({
   min: {
     type: Number,
@@ -24,7 +26,9 @@ const props = defineProps({
   disabled: Boolean,
 })
 
+const dragTimeout = ref(null) // value of setTimeout fn
 const isDragging = ref(false) // check if element is being dragged or not
+const dragDelay = ref(100) // setTimerout duration
 const handlerWidth = ref(0) // track the handler element and update when window resizes
 const barWidth = ref(0) // track the value of the width of the bar
 
@@ -34,11 +38,19 @@ const handler = ref(null)
 onMounted(() => {
   getDimensions()
   window.addEventListener('resize', throttledWindowResize)
+
+  document.addEventListener('mouseup', onDocumentMouseUp)
+  document.addEventListener('mousemove', onDocumentMouseMove)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', onWindowResize)
+
+  document.removeEventListener('mouseup', onDocumentMouseUp)
+  document.removeEventListener('mousemove', onDocumentMouseMove)
 })
+
+/** Computed Start */
 
 const fillRatio = computed(() => {
   return props.value / props.max
@@ -52,12 +64,22 @@ const fillStyle = computed(() => {
 })
 
 const handlerStyle = computed(() => {
-  const offset = barWidth.value * fillRatio.value - handlerWidth.value * 0.5
+  // const offset = barWidth.value * fillRatio.value - handlerWidth.value * 0.5
 
   return {
-    transform: `translateX(${offset}px)`,
+    // transform: `translateX(${offset}px)`,
+    transform: `translateX(${barWidth.value * fillRatio.value - handlerWidth.value * 0.5}px)`,
   }
 })
+
+const classes = computed(() => {
+  return {
+    slider: true,
+    'slider--dragging': isDragging.value,
+  }
+})
+
+/** Methods Start */
 
 const onWindowResize = () => {
   getDimensions()
@@ -69,6 +91,71 @@ const getDimensions = () => {
   // target DOM Element thru ref="bar/handler"
   handlerWidth.value = handler.value.offsetWidth
   barWidth.value = bar.value.offsetWidth
+}
+
+const onSliderMouseDown = () => {
+  if (props.disabled) return
+
+  dragTimeout.value = setTimeout(() => {
+    isDragging.value = true
+    dragTimeout.value = null
+
+    emit('dragstart')
+    console.log('Started dragging')
+  }, dragDelay.value)
+}
+
+const onSliderClick = (e) => {
+  if (props.disabled) return
+  calculate(e)
+}
+
+/** Method eventListener */
+function onDocumentMouseMove(e) {
+  if (props.disabled || !isDragging.value) return
+
+  calculate(e)
+}
+
+const onDocumentMouseUp = () => {
+  if (props.disabled) return
+
+  if (dragTimeout.value) {
+    clearTimeout(dragTimeout.value)
+    dragTimeout.value = null
+
+    emit('click')
+    console.log('Clicked')
+  } else {
+    isDragging.value = false
+    emit('dragend')
+    console.log('Ended dragging')
+  }
+}
+
+const lerp = (min, max, t) => {
+  return min + (max - min) * t
+}
+
+const calculate = (e) => {
+  /**
+   * Holt die X-Position der Maus relativ zur bar
+   * Berechnet den Delta-Wert (0–1) und emittiert den neuen Wert über input
+   */
+
+  if (!bar.value || barWidth.value === 0) return
+
+  const barLevelX = getRelativeXPosition(e, bar.value)
+
+  // volumeLevel -> ergebnis vom relativeX / barWidth is eine Zahl zwischen 0 & 1
+  const volumeLevel = barLevelX / barWidth.value
+
+  console.log('barLevelX, barWidth:', barLevelX, barWidth.value)
+  console.log('props.min, props.max, volumeLevel:', props.min, props.max, volumeLevel)
+
+  const interpolated = lerp(props.min, props.max, volumeLevel)
+
+  emit('input', interpolated)
 }
 </script>
 
@@ -82,7 +169,12 @@ const getDimensions = () => {
 
   &__fill,
   &__handler {
-    transition: transform 0.3s ease-in-out;
+    transition: transform 0.025s ease-in-out;
+  }
+
+  .slider--dragging .slider__fill,
+  .slider--dragging .slider__handle {
+    transition: none;
   }
 
   &__bar {
