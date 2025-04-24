@@ -1,7 +1,13 @@
 <template>
   <div class="player">
     <div class="player__sizer">
-      <video ref="videoRef" @play="onVideoPlay" @pause="onVideoPause" @click="togglePlay">
+      <video
+        ref="videoRef"
+        @play="onVideoPlay"
+        @pause="onVideoPause"
+        @click="togglePlay"
+        @volumechange="onVideoVolumeChange"
+      >
         <source type="video/webm" :src="videoUrl" />
         Your browser does not support the video tag.
       </video>
@@ -18,9 +24,19 @@
           :icon="isPlaying ? 'mdi-pause' : 'mdi-play'"
           @click="togglePlay"
         />
-        <q-btn color="white" flat round icon="mdi-volume-high" @click="toggleSound" />
+        <q-btn
+          color="white"
+          flat
+          round
+          :icon="isMuted ? 'mdi-volume-off' : 'mdi-volume-high'"
+          @click="toggleSound"
+        />
 
-        <Slider class="player__sound-slider q-mr-md" :value="1" />
+        <Slider
+          class="player__sound-slider q-mr-md"
+          :value="volume"
+          @input="handleVolumeSliderChange"
+        />
 
         <div class="player__time">00:000 / 00/00</div>
 
@@ -47,6 +63,7 @@ const videoUrl = ref(
 
 const isPlaying = ref(false)
 const isMuted = ref(false)
+const volume = ref(1)
 const isFullscreen = ref(false)
 const duration = ref(0)
 const currentTime = ref(0)
@@ -82,6 +99,47 @@ const onVideoPause = () => {
 const onDocumentKeyUp = (e) => {
   if (e.keyCode === 32) {
     togglePlay()
+  }
+}
+
+// Sound Control
+const toggleSound = () => {
+  const video = videoRef.value
+  if (!video) return
+
+  if (video.volume <= 0) {
+    video.volume = 0.5
+  }
+
+  video.muted = !video.muted
+}
+
+const onVideoVolumeChange = () => {
+  const video = videoRef.value
+
+  if (video) {
+    isMuted.value = video.muted
+    volume.value = video.volume
+  }
+}
+
+const handleVolumeSliderChange = (value) => {
+  const video = videoRef.value
+
+  if (video) {
+    if (video.muted && value > 0) {
+      video.muted = false
+    }
+
+    if (value <= 0) {
+      video.muted = true
+    }
+
+    video.volume = value
+
+    // update local state as well
+    volume.value = value
+    isMuted.value = video.muted
   }
 }
 </script>
