@@ -18,7 +18,7 @@
     <div class="player__gradient" />
 
     <div class="player__controls">
-      <q-toolbar class="bg-transparent player__toolbar" dense flat>
+      <q-toolbar class="bg-transparent player__toolbar" flat>
         <q-btn
           color="white"
           flat
@@ -44,7 +44,13 @@
 
         <q-space />
 
-        <q-btn color="white" flat round icon="mdi-fullscreen" @click="toggleFullscreen" />
+        <q-btn
+          color="white"
+          flat
+          round
+          :icon="isFullscreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'"
+          @click="toggleFullscreen"
+        />
       </q-toolbar>
     </div>
 
@@ -74,10 +80,14 @@ const videoRef = ref(null)
 
 onMounted(() => {
   document.addEventListener('keyup', onDocumentKeyUp)
+
+  screenfull.onchange(onFullscreenChange)
 })
 
 onBeforeUnmount(() => {
   document.removeEventListener('keyup', onDocumentKeyUp)
+
+  screenfull.off('change', onFullscreenChange)
 })
 
 const togglePlay = () => {
@@ -186,6 +196,10 @@ const handleVolumeSliderChange = (value) => {
     volume.value = value
     isMuted.value = video.muted
   }
+}
+
+const onFullscreenChange = () => {
+  isFullscreen.value = screenfull.isFullscreen
 }
 
 const toggleFullscreen = () => {
