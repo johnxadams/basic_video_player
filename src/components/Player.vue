@@ -8,6 +8,7 @@
         @click="togglePlay"
         @volumechange="onVideoVolumeChange"
         @loadedmetadata="onVideoLoadedMetaData"
+        @timeupdate="onVideoTimeupdate"
       >
         <source type="video/webm" :src="videoUrl" />
         Your browser does not support the video tag.
@@ -39,7 +40,7 @@
           @input="handleVolumeSliderChange"
         />
 
-        <div class="player__time">00:000 / 00/00</div>
+        <div class="player__time">{{ currentTimeFormatted }} / {{ durationFormatted }}</div>
 
         <q-space />
 
@@ -54,7 +55,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import Slider from './Slider.vue'
 
 // const value = ref(0.3)
@@ -97,6 +98,17 @@ const onVideoPause = () => {
   isPlaying.value = false
 }
 
+// Time Control / Update */
+const formatTime = (seconds) => {
+  const hours = Math.floor(seconds / 3600)
+  const minutes = Math.floor((seconds % 3600) / 60)
+  const remainingSeconds = Math.floor(seconds % 60)
+
+  const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
+
+  return formattedTime
+}
+
 const onVideoLoadedMetaData = () => {
   const video = videoRef.value
 
@@ -104,12 +116,21 @@ const onVideoLoadedMetaData = () => {
   if (video) {
     duration.value = video.duration
     currentTime.value = video.currentTime
-
-    // eslint-disable-next-line no-console
-    console.log('currentTime.value   : ', currentTime.value)
-    // eslint-disable-next-line no-console
-    console.log('duration.value   : ', duration.value)
   }
+}
+
+const currentTimeFormatted = computed(() => {
+  return formatTime(Math.round(currentTime.value))
+})
+
+const durationFormatted = computed(() => {
+  return formatTime(Math.round(duration.value))
+})
+
+const onVideoTimeupdate = () => {
+  const video = videoRef.value
+  // native timeUpdate
+  currentTime.value = video.currentTime
 }
 
 const onDocumentKeyUp = (e) => {
