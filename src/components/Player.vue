@@ -98,6 +98,12 @@ const onVideoPause = () => {
   isPlaying.value = false
 }
 
+const onDocumentKeyUp = (e) => {
+  if (e.keyCode === 32) {
+    togglePlay()
+  }
+}
+
 // Time Control / Update */
 const formatTime = (seconds) => {
   const hours = Math.floor(seconds / 3600)
@@ -131,12 +137,6 @@ const onVideoTimeupdate = () => {
   const video = videoRef.value
   // native timeUpdate
   currentTime.value = video.currentTime
-}
-
-const onDocumentKeyUp = (e) => {
-  if (e.keyCode === 32) {
-    togglePlay()
-  }
 }
 
 // Sound Control
