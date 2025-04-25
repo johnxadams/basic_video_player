@@ -18,6 +18,13 @@
     <div class="player__gradient" />
 
     <div class="player__controls">
+      <Slider
+        class="player__seeker"
+        :max="duration"
+        :value="currentTime"
+        @input="handleTimeSeeker"
+      />
+
       <q-toolbar class="bg-transparent player__toolbar" flat>
         <q-btn
           color="white"
@@ -230,6 +237,13 @@ const toggleFullscreen = () => {
 //     }
 //   }
 // }
+
+const handleTimeSeeker = (time) => {
+  const video = videoRef.value
+  // when the user clicks or drag, update both the currentTime variable and the video element's current time
+  currentTime.value = time
+  video.currentTime = time
+}
 </script>
 
 <style lang="scss" scoped>
