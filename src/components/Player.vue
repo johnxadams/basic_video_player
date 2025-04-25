@@ -9,6 +9,7 @@
         @volumechange="onVideoVolumeChange"
         @loadedmetadata="onVideoLoadedMetaData"
         @timeupdate="onVideoTimeupdate"
+        @progress="onVideoProgress"
       >
         <source type="video/webm" :src="videoUrl" />
         Your browser does not support the video tag.
@@ -18,6 +19,12 @@
     <div class="player__gradient" />
 
     <div class="player__controls">
+      <Slider class="player__seeker" :max="duration" :value="currentTime" @input="handleTimeSeeker">
+        <template #bar>
+          <div class="player__time-seeker-buffer" :style="bufferedStyle" />
+        </template>
+      </Slider>
+
       <q-toolbar class="bg-transparent player__toolbar" flat>
         <q-btn
           color="white"
@@ -77,6 +84,7 @@ const isFullscreen = ref(false)
 const duration = ref(0)
 const currentTime = ref(0)
 const videoRef = ref(null)
+const bufferedProgress = ref(0)
 
 onMounted(() => {
   document.addEventListener('keyup', onDocumentKeyUp)
@@ -230,6 +238,40 @@ const toggleFullscreen = () => {
 //     }
 //   }
 // }
+
+const handleTimeSeeker = (time) => {
+  const video = videoRef.value
+  // when the user clicks or drag, update both the currentTime variable and the video element's current time
+  currentTime.value = time
+  video.currentTime = time
+}
+
+const onVideoProgress = () => {
+  const video = videoRef.value
+  if (!video) return
+
+  const { duration, currentTime, buffered } = video
+
+  if (duration > 0) {
+    const bufferedLength = buffered.length
+
+    for (let i = 0; i < bufferedLength; i++) {
+      const start = buffered.start(i)
+      const end = buffered.end(i)
+
+      if (start < currentTime && end > currentTime) {
+        bufferedProgress.value = end / duration
+      }
+    }
+  }
+}
+
+const bufferedStyle = computed(() => {
+  return {
+    transformOrigin: 'left center',
+    transform: `scaleX(${bufferedProgress.value})`,
+  }
+})
 </script>
 
 <style lang="scss" scoped>
@@ -254,10 +296,19 @@ const toggleFullscreen = () => {
 
   &__controls {
     position: absolute;
-    border: 2px red solid;
     bottom: 0;
     left: 0;
     right: 0;
+  }
+
+  &__time-seeker-buffer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.304);
+    z-index: 0;
   }
 
   &__sound-slider {

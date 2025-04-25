@@ -3,6 +3,7 @@
     <div class="slider__bar" ref="bar">
       <div class="slider__handler" ref="handler" :style="handlerStyle"></div>
       <div class="slider__fill" :style="fillStyle"></div>
+      <slot name="bar" />
     </div>
   </div>
 </template>
@@ -181,7 +182,7 @@ const calculate = (e) => {
     position: relative;
     width: 100%;
     height: 4px;
-    background-color: rgba($color: #cf3d3d, $alpha: 0.7);
+    background-color: rgba($color: #ffffff, $alpha: 0.3);
   }
 
   &__handler {
