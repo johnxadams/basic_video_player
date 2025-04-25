@@ -7,6 +7,7 @@
         @pause="onVideoPause"
         @click="togglePlay"
         @volumechange="onVideoVolumeChange"
+        @loadedmetadata="onVideoLoadedMetaData"
       >
         <source type="video/webm" :src="videoUrl" />
         Your browser does not support the video tag.
@@ -94,6 +95,21 @@ const onVideoPlay = () => {
 
 const onVideoPause = () => {
   isPlaying.value = false
+}
+
+const onVideoLoadedMetaData = () => {
+  const video = videoRef.value
+
+  // get video meta data(time) after video is loaded
+  if (video) {
+    duration.value = video.duration
+    currentTime.value = video.currentTime
+
+    // eslint-disable-next-line no-console
+    console.log('currentTime.value   : ', currentTime.value)
+    // eslint-disable-next-line no-console
+    console.log('duration.value   : ', duration.value)
+  }
 }
 
 const onDocumentKeyUp = (e) => {
