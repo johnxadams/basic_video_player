@@ -44,7 +44,7 @@
 
         <q-space />
 
-        <q-btn color="white" flat round icon="mdi-fullscreen" />
+        <q-btn color="white" flat round icon="mdi-fullscreen" @click="toggleFullscreen" />
       </q-toolbar>
     </div>
 
@@ -56,6 +56,7 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import screenfull from 'screenfull'
 import Slider from './Slider.vue'
 
 // const value = ref(0.3)
@@ -186,6 +187,35 @@ const handleVolumeSliderChange = (value) => {
     isMuted.value = video.muted
   }
 }
+
+const toggleFullscreen = () => {
+  if (!screenfull.isEnabled) return
+
+  const videoScreen = videoRef.value
+
+  if (screenfull.element === videoScreen) {
+    screenfull.exit()
+  } else {
+    screenfull.request(videoScreen)
+  }
+}
+
+// const toggleFullscreen = () => {
+//   const videoScreen = videoRef.value
+
+//   if (document.fullscreenElement) {
+//     document.exitFullscreen()
+//   } else {
+//     if (videoScreen.requestFullscreen) {
+//       videoScreen.requestFullscreen()
+//     } else if (videoScreen.webkitRequestFullscreen) {
+//       videoScreen.webkitRequestFullscreen()
+//       /** only chrome, safari and opera
+//        * else: videoScreen.mozRequestFullScreen()/msRequestFullscreen/requestFullscreen
+//       */
+//     }
+//   }
+// }
 </script>
 
 <style lang="scss" scoped>
