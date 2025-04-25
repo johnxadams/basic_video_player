@@ -65,11 +65,10 @@ const fillStyle = computed(() => {
 })
 
 const handlerStyle = computed(() => {
-  // const offset = barWidth.value * fillRatio.value - handlerWidth.value * 0.5
+  const offset = barWidth.value * fillRatio.value - handlerWidth.value * 0.5
 
   return {
-    // transform: `translateX(${offset}px)`,
-    transform: `translateX(${barWidth.value * fillRatio.value - handlerWidth.value * 0.5}px)`,
+    transform: `translateX(${offset}px)`,
   }
 })
 
@@ -102,7 +101,6 @@ const onSliderMouseDown = () => {
     dragTimeout.value = null
 
     emit('dragstart')
-    console.log('Started dragging')
   }, dragDelay.value)
 }
 
@@ -126,11 +124,9 @@ const onDocumentMouseUp = () => {
     dragTimeout.value = null
 
     emit('click')
-    console.log('Clicked')
   } else {
     isDragging.value = false
     emit('dragend')
-    console.log('Ended dragging')
   }
 }
 
@@ -150,9 +146,6 @@ const calculate = (e) => {
 
   // volumeLevel -> ergebnis vom relativeX / barWidth is eine Zahl zwischen 0 & 1
   const volumeLevel = barLevelX / barWidth.value
-
-  console.log('barLevelX, barWidth:', barLevelX, barWidth.value)
-  console.log('props.min, props.max, volumeLevel:', props.min, props.max, volumeLevel)
 
   const interpolated = lerp(props.min, props.max, volumeLevel)
 
@@ -190,7 +183,7 @@ const calculate = (e) => {
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    background-color: #3b53cd;
+    background-color: #ffffff;
     left: 0;
     top: calc(50% - 7px); // align element in the middle  -> 7px is 50% of 14px height&width
     z-index: 2; // set handle above fill_Element
