@@ -120,11 +120,11 @@ const onVideoLoadedMetaData = () => {
 }
 
 const currentTimeFormatted = computed(() => {
-  return formatTime(Math.round(currentTime.value))
+  return formatTime(currentTime.value)
 })
 
 const durationFormatted = computed(() => {
-  return formatTime(Math.round(duration.value))
+  return formatTime(duration.value)
 })
 
 const onVideoTimeupdate = () => {
