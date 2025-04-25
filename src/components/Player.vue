@@ -118,6 +118,12 @@ const onVideoVolumeChange = () => {
   const video = videoRef.value
 
   if (video) {
+    /**
+     * native values of video element —
+     * whether it's muted or has sound —
+     * are passed to isMuted and volume refs.
+     * synchronize natives & variables
+     */
     isMuted.value = video.muted
     volume.value = video.volume
   }
@@ -126,18 +132,19 @@ const onVideoVolumeChange = () => {
 const handleVolumeSliderChange = (value) => {
   const video = videoRef.value
 
+  // unmute video + icon, if slider value > 0
   if (video) {
     if (video.muted && value > 0) {
       video.muted = false
     }
 
+    // switch vid + icon to mute, if user slides volume to 0
     if (value <= 0) {
       video.muted = true
     }
 
     video.volume = value
 
-    // update local state as well
     volume.value = value
     isMuted.value = video.muted
   }
