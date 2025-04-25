@@ -19,7 +19,12 @@
     <div class="player__gradient" />
 
     <div class="player__controls">
-      <Slider class="player__seeker" :max="duration" :value="currentTime" @input="handleTimeSeeker">
+      <Slider
+        class="player__time-seeker"
+        :max="duration"
+        :value="currentTime"
+        @input="handleTimeSeeker"
+      >
         <template #bar>
           <div class="player__time-seeker-buffer" :style="bufferedStyle" />
         </template>
@@ -278,10 +283,15 @@ const bufferedStyle = computed(() => {
 .player {
   position: relative;
   width: 100%;
+  border-radius: 15px;
+  overflow: hidden;
+  margin-top: 5%;
+  box-shadow:
+    rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
+    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
 
   video {
     position: absolute;
-
     width: 100%;
     height: 100%;
     top: 0;
@@ -299,6 +309,10 @@ const bufferedStyle = computed(() => {
     bottom: 0;
     left: 0;
     right: 0;
+    padding: 0 10px;
+  }
+  &__toolbar {
+    padding-bottom: 8px;
   }
 
   &__time-seeker-buffer {
@@ -320,15 +334,14 @@ const bufferedStyle = computed(() => {
   }
 
   &__gradient {
-    background: #000000;
     background: linear-gradient(0deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 100%);
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
     z-index: 0;
-    height: 25%; //  responsiveness
-    opacity: 0.7;
+    height: 25%;
+    opacity: 0.9;
   }
 }
 </style>
